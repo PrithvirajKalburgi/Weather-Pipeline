@@ -7,4 +7,4 @@ if __name__ == '__main__':
     for city in CITIES:
         luigi.build([MergeandAverageData(city=city)], local_scheduler = True)
 
-    visualise_weather_data(city)
+    visualise_weather_data(CITIES)

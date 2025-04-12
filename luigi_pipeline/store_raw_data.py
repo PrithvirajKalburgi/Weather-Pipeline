@@ -41,7 +41,7 @@ class StoreRawData(luigi.Task):
             weatherapi_data = json.load(f)
 
         # Assuming we want to use the localtime from WeatherAPI as timestamp
-        timestamp = weatherapi_data['location']['localtime']
+        #timestamp = weatherapi_data['location']['localtime']
 
         # Insert data from OpenWeather
         cursor.execute('''
@@ -52,7 +52,7 @@ class StoreRawData(luigi.Task):
               openweather_data['wind']['speed'], 
               openweather_data['main']['humidity'],
               openweather_data['main']['feels_like'],
-              timestamp
+              weatherapi_data['location']['localtime'],
               ))
 
         # Insert data from WeatherAPI
@@ -64,7 +64,7 @@ class StoreRawData(luigi.Task):
               weatherapi_data['current']['wind_kph'], 
               weatherapi_data['current']['humidity'],
               weatherapi_data['current']['feelslike_c'],
-              timestamp
+              weatherapi_data['location']['localtime'],
               ))
 
         conn.commit()

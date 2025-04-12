@@ -20,12 +20,21 @@ class MergeandAverageData(luigi.Task):
         query = "SELECT * FROM weather_data WHERE city = ?"
         df = pd.read_sql(query, conn, params=(self.city,))
 
+        openweather_df = df[df['source'] == 'openweather']
+        weatherapi_df = df[df['source'] == 'weatherapi']
+
+# Calculate the average of each source
+        combined_df = pd.concat([openweather_df, weatherapi_df])
+
+        # Now, calculate the average values for the city across both sources
         avg_data = {
-            'temperature': df['temperature'].mean(),
-            'wind_speed': df['wind_speed']. mean(),
-            'humidity': df['humidity'].mean(),
-            'feels_like': df['feels_like'].mean()
+            'temperature': combined_df['temperature'].mean(),
+            'wind_speed': combined_df['wind_speed'].mean(),
+            'humidity': combined_df['humidity'].mean(),
+            'feels_like': combined_df['feels_like'].mean(),
         }
+
+
 
         with self.output().open('w') as f:
             json.dump(avg_data, f)
