@@ -22,10 +22,15 @@ class MergeandAverageData(luigi.Task):
         query = "SELECT * FROM weather_data WHERE city = ?"
         df = pd.read_sql(query, conn, params=(self.city,))
 
+        timestamp = df['timestamp'].iloc[0]
+        timestamp_utc = df['timestamp_utc'].iloc[0]
+
         
         # Now, calculate the average values for the city across both sources
         avg_data = {
             'city': self.city,
+            'timestamp': timestamp,
+            'timestamp_utc': timestamp_utc,
             'temperature': df['temperature'].mean(),
             'wind_speed': df['wind_speed'].mean(),
             'humidity': df['humidity'].mean(),

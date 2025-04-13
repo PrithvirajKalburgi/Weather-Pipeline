@@ -30,7 +30,9 @@ class StoreRawData(luigi.Task):
            wind_speed REAL,
            humidity REAL,
            feels_like REAL,
-           timestamp TEXT
+           timestamp TEXT,
+           timestamp_utc TEXT
+        
         )
         ''')
 
@@ -40,31 +42,33 @@ class StoreRawData(luigi.Task):
         with self.input()[1].open('r') as f:
             weatherapi_data = json.load(f)
 
-        # Assuming we want to use the localtime from WeatherAPI as timestamp
-        #timestamp = weatherapi_data['location']['localtime']
+        local_timestamp = weatherapi_data['location']['localtime']
+        utc_timestamp = weatherapi_data['location']['localtime_epoch']
 
         # Insert data from OpenWeather
         cursor.execute('''
-        INSERT INTO weather_data (city, source, temperature, wind_speed, humidity, feels_like, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO weather_data (city, source, temperature, wind_speed, humidity, feels_like, timestamp, timestamp_utc)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (self.city, 'openweather', 
               openweather_data['main']['temp'],
               openweather_data['wind']['speed'], 
               openweather_data['main']['humidity'],
               openweather_data['main']['feels_like'],
-              weatherapi_data['location']['localtime'],
+              local_timestamp,
+              utc_timestamp
               ))
 
         # Insert data from WeatherAPI
         cursor.execute('''
-        INSERT INTO weather_data (city, source, temperature, wind_speed, humidity, feels_like, timestamp)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO weather_data (city, source, temperature, wind_speed, humidity, feels_like, timestamp, timestamp_utc)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ''', (self.city, 'weatherapi', 
               weatherapi_data['current']['temp_c'],
               weatherapi_data['current']['wind_kph'], 
               weatherapi_data['current']['humidity'],
               weatherapi_data['current']['feelslike_c'],
-              weatherapi_data['location']['localtime'],
+              local_timestamp,
+              utc_timestamp
               ))
 
         conn.commit()

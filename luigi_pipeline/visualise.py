@@ -26,15 +26,15 @@ def visualise_weather_data(cities):
     
     # Convert to DataFrame
     df = pd.DataFrame(records)
-    df = df[['city', 'temperature', 'wind_speed', 'humidity', 'feels_like']]  # Clean column order
-    df.columns = ['City', 'Temperature (°C)', 'Wind Speed (km/h)', 'Humidity (%)', 'Feels Like (°C)']
+    df = df[['city', 'timestamp', 'temperature', 'wind_speed', 'humidity', 'feels_like']]  # Clean column order
+    df.columns = ['City','Time', 'Temperature (°C)', 'Wind Speed (km/h)', 'Humidity (%)', 'Feels Like (°C)']
 
     df[['Temperature (°C)', 'Wind Speed (km/h)', 'Humidity (%)', 'Feels Like (°C)']] = df[
     ['Temperature (°C)', 'Wind Speed (km/h)', 'Humidity (%)', 'Feels Like (°C)']
     ].round(1)
 
     # Create a figure and axis
-    fig, ax = plt.subplots(figsize=(10, len(df) * 0.7 + 1))  # Dynamic height based on rows
+    fig, ax = plt.subplots(figsize=(12, len(df) * 0.7 + 1))  # Dynamic height based on rows
     ax.axis('off')
 
     plt.title("Weather Data Summary", fontsize=16, fontweight='bold', pad=20)
@@ -51,6 +51,8 @@ def visualise_weather_data(cities):
     table.auto_set_font_size(False)
     table.set_fontsize(10)
     table.scale(1.2, 1.2)
+
+    table.auto_set_column_width([0, 1, 2, 3, 4, 5])
 
     # Save as image
     output_path = "weather_summary_table.png"
