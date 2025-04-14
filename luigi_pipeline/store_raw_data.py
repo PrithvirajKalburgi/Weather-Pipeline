@@ -2,6 +2,7 @@ import luigi
 import sqlite3
 import json
 import time
+import os
 from luigi import LocalTarget
 from luigi_pipeline.fetch_openweather import FetchOpenWeatherData
 from luigi_pipeline.fetch_weatherapi import FetchWeatherAPIData
@@ -21,7 +22,6 @@ class StoreRawData(luigi.Task):
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
-        # Create the table with the timestamp column
         cursor.execute(''' 
         CREATE TABLE IF NOT EXISTS weather_data (
            city TEXT,
@@ -36,6 +36,7 @@ class StoreRawData(luigi.Task):
         )
         ''')
 
+
         with self.input()[0].open('r') as f:
             openweather_data = json.load(f)
 
@@ -45,7 +46,7 @@ class StoreRawData(luigi.Task):
         local_timestamp = weatherapi_data['location']['localtime']
         utc_timestamp = weatherapi_data['location']['localtime_epoch']
 
-        # Insert data from OpenWeather
+
         cursor.execute('''
         INSERT INTO weather_data (city, source, temperature, wind_speed, humidity, feels_like, timestamp, timestamp_utc)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -58,7 +59,6 @@ class StoreRawData(luigi.Task):
               utc_timestamp
               ))
 
-        # Insert data from WeatherAPI
         cursor.execute('''
         INSERT INTO weather_data (city, source, temperature, wind_speed, humidity, feels_like, timestamp, timestamp_utc)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)

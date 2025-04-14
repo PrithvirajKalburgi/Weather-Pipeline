@@ -16,6 +16,7 @@ class MergeandAverageData(luigi.Task):
         return LocalTarget(f'data/merged_and_averaged_{self.city}.json')
     
     def run(self):
+        
         DB_PATH = f'data/store_{self.city}_raw_data.db'
         conn = sqlite3.connect(DB_PATH)
 
@@ -25,8 +26,6 @@ class MergeandAverageData(luigi.Task):
         timestamp = df['timestamp'].iloc[0]
         timestamp_utc = df['timestamp_utc'].iloc[0]
 
-        
-        # Now, calculate the average values for the city across both sources
         avg_data = {
             'city': self.city,
             'timestamp': timestamp,
@@ -37,8 +36,6 @@ class MergeandAverageData(luigi.Task):
             'feels_like': df['feels_like'].mean(),
             'sources_combined': len(df),
         }
-
-
 
         with self.output().open('w') as f:
             json.dump(avg_data, f)

@@ -1,4 +1,5 @@
 import luigi
+import os
 from config import CITIES
 from luigi_pipeline.merge_and_average import MergeandAverageData
 from luigi_pipeline.visualise import visualise_weather_data
